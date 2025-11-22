@@ -1,0 +1,6 @@
+.pixel {
+    border: 1px solid rgb(245, 245, 245);
+}
+.pixel:hover {
+    border: 1px solid black;
+}
