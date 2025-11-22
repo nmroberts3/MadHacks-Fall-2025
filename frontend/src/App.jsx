@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Button, Card } from 'react-bootstrap'
 import { useWebSocket } from './hooks/webHooks'
+import { authenticate } from './services/restService'
 import './App.css'
 import { HashRouter, Route, Routes } from 'react-router'
 import Screen from './components/Screen'
@@ -10,22 +11,31 @@ function App() {
 
   const { isConnected, message, send } = useWebSocket("ws://localhost:8080/ws");
 
-  
+  // code for sending update
 
-  {/* code for sending update*/}
+  return (
+    <Card>
+      <div className="controls">
+        <Button onClick={async () => {
+          const token = await authenticate();
+          console.log("Got token:", token);
+        }}>
+          Authenticate
+        </Button>
 
-  <Button onClick={() => {
-    send({ type: "paint", x: document.getElementById("xCoord").value, y: document.getElementById("yCoord").value , color : document.getElementById("color").value});
-  }}>
-    Send Update
-  </Button>
+        <Button onClick={() => {
+          const x = document.getElementById("xCoord")?.value;
+          const y = document.getElementById("yCoord")?.value;
+          const color = document.getElementById("color")?.value;
+          send({ type: "paint" , auth: "", building, x, y, color });
+        }}>
+          Send Update
+        </Button>
+      </div>
 
-  return <Card>
-
-    <Screen/>
-
-
-  </Card>
+      <Screen/>
+    </Card>
+  );
 }
 
 export default App
