@@ -29,9 +29,7 @@ authRouter.post("/", (req, res) => {
     const query = `
     SELECT 
         b.name, 
-        ST_DumpValues(c.content_data, 1) as red_channel,
-        ST_DumpValues(c.content_data, 2) as green_channel,
-        ST_DumpValues(c.content_data, 3) as blue_channel
+        c.content_data
     FROM 
         buildings b
     JOIN 
@@ -66,23 +64,11 @@ authRouter.post("/", (req, res) => {
             }
 
         const id = crypto.randomUUID();
-    
-        const state = new Array(100);
-
-        for (let i = 0; i < 100; i++) {
-            state[i] = new Array(100);
-        }
-
-        for (let i = 0; i < 100; i++) {
-            for (let j = 0; j < 100; j++) {
-                state[i][j] = [query_res.red_channel[i][j], query_res.green_channel[i][j], query_res.blue_channel[i][j]];
-            }
-        }
 
         res.send({
             id: id,
             building: query_res.name,
-            state: state
+            state: query_res.content_data
         });
     }
     });
