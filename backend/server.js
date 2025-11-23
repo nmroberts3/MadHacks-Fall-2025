@@ -1,4 +1,4 @@
-import { getState } from "./services/database.js"
+const{ getState} =  require("./services/database.js")
 require('dotenv').config();
 const express = require('express');
 
