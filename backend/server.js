@@ -4,12 +4,19 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const { updateRedis } = require('./services/redisService.js');
+const adminRouter = require('./services/adminRouter.js');
 
 const { pool } = require('./db.js');
 
-const app = express();
+const cors = require('cors');
 
-const port = process.env.SERVER_PORT;
+
+const app = express()
+const port = process.env.SERVER_PORT || 3000
+
+// Middleware
+app.use(cors())
+app.use(express.json())
 
 const {authRoutes, usersForBuilding} = require("./services/authService.js");
 
@@ -96,3 +103,16 @@ server.listen(port, () => {
     console.log(`Listening on Port ${port}`);
 });
 
+// Routes
+app.use('/admin', adminRouter)
+
+// Health check
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'BadgerBoard API Server' 
+  })
+})
+
+
+module.exports = app
