@@ -1,15 +1,12 @@
-import { useState, useRef, useEffect } from 'react'
-import { Button, Card } from 'react-bootstrap'
+import { useState, useEffect, useRef } from 'react'
 import './Screen.css'
 
 function Screen({ selectedColor }) {
-  const [pixels, setPixels] = useState(Array(100*100).fill('rgb(255, 255, 255)'))
-  const [colored, setColored] = useState(-1)
-  const pixelSize = 10
-
-  const [timerRunning, setTimerRunning] = useState(false);
-  const [timeElapsed, setTimeElapsed] = useState(0);
-  const intervalRef = useRef(null);
+  const [pixels, setPixels] = useState(Array(100 * 100).fill('rgb(255, 255, 255)'))
+  const [clicked, setClicked] = useState(false);
+  const [mouseMoved, setMouseMoved] = useState(false);
+  const [ripple, setRipple] = useState(null); // { index, id }
+  const pixelSize = 10;
 
   const [userId, setUserId] = useState(0);
 
@@ -122,35 +119,31 @@ function Screen({ selectedColor }) {
 
     // Message Received
 
-
   const handleMouseDown = () => {
-    setTimerRunning(true);
-    // Start the timer
-    intervalRef.current = setInterval(() => {
-      setTimeElapsed(prevTime => prevTime + 100); // Increment every 100ms
-    }, 100);
-  };
-
-  const handleMouseUp = () => {
-    setTimerRunning(false);
-    // Stop the timer
-    clearInterval(intervalRef.current);
+    setClicked(true);
+    setMouseMoved(false);
   };
 
   const handleMouseLeave = () => {
-    // Also stop the timer if the mouse leaves the element while pressed
-    if (timerRunning) {
-      setTimerRunning(false);
-      clearInterval(intervalRef.current);
-    }
+    if (clicked) setMouseMoved(true);
   };
 
-  useEffect(() => {
-    // Cleanup function to clear the interval if the component unmounts
-    return () => {
-      clearInterval(intervalRef.current);
-    };
-  }, []);
+  const handleMouseUp = (event, i) => {
+    setClicked(false);
+
+    if (!mouseMoved) {
+
+      setPixels(prevPixels => {
+        const copy = [...prevPixels];
+        copy[i] = selectedColor || 'black';
+        return copy;
+      });
+
+      sendPaint(i/100, i%100, selectedColor || 'black');
+      
+      setRipple({ index: i, id: Date.now() });
+    }
+  };
 
   return (
     <div 
@@ -159,43 +152,32 @@ function Screen({ selectedColor }) {
         gridTemplateColumns: `repeat(100, ${pixelSize}px)`,
         gridTemplateRows: `repeat(100, ${pixelSize}px)`,
         border: '3px solid rgb(210, 210, 200)',
-        width: (100*pixelSize +5),
+        width: (100 * pixelSize + 5),
         background: 'white',
         margin: '20px auto'
       }}
     >
-
-      {
-        pixels.map((p, i) => (
-          <div
-            key={i}
-            className='pixel'
-            style={{
-              background: p
-            }}
-            onMouseUp={() => {
-              
-              
-              if (timeElapsed < 200) {
-                setPixels(
-                  prevPixels => {
-                    const copy = [...prevPixels]
-                    copy[i] = selectedColor || 'black'
-                    return copy
-                  }
-                )
-              }
-              setTimerRunning(false);
-              clearInterval(intervalRef.current);
-            }}
-
-            onMouseDown={handleMouseDown}
-            onMouseLeave={handleMouseLeave}
-          />
-        ))
-      }
+      {pixels.map((p, i) => (
+        <div
+          key={i}
+          className="pixel"
+          style={{ background: p }}
+          onMouseUp={(e) => handleMouseUp(e, i)}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+        >
+          {ripple && ripple.index === i && (
+            <div
+              // id in key helps restart the CSS animation on each click
+              key={ripple.id}
+              className="ripple"
+              onAnimationEnd={() => setRipple(null)}
+            />
+          )}
+        </div>
+      ))}
     </div>
-  )
+  );
 }
 
-export default Screen
+export default Screen;
