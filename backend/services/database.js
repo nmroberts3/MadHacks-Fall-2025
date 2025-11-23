@@ -1,14 +1,20 @@
-// 
-const getState = (coords) => {
-    return /* some sql */;
+import {getRedis, loadRedis} from './redisService.js';
+const { pool } = ;
+
+const getState = () => {
+    // Load all buildingIds from SQL
+
+
+
+    // for each buildingId, call loadRedis
+
+    loadRedis(buildingId, state);
 }; 
 
-const updateState = (id, move) => {
+
+const loadState = async (buidlingId) => {
+    redisData = await getRedis(buidlingId);
     return /* some sql */;
 }
 
-const queryBounds = () => {
-    return /* some sql */;
-}
-
-export { getState , updateState };
+export { getState , loadState };
