@@ -1,4 +1,5 @@
 const WebSocket = require('ws');
+import updateRedis from '../services/redisService.js';
 
 // 1. Setup the WebSocket Server
 const wss = new WebSocket.Server({ port: 8080 });
@@ -14,12 +15,6 @@ const db = {
         // In reality: await pool.query('SELECT building_id FROM users WHERE id = $1', [userId])
         // Mocking return value:
         return "building_1"; 
-    },
-    // Updates the grid in the DB
-    updateGridBlock: async (buildingId, x, y, value) => {
-        // In reality: await pool.query('UPDATE grids SET ...')
-        console.log(`[DB] Updated Grid for ${buildingId}: [${x}, ${y}] = ${value}`);
-        return true;
     }
 };
 // ----------------------------------------------------
@@ -51,13 +46,14 @@ async function handlePaintRequest(ws, data) {
     const { x, y, value, userId } = data;
 
     // A. Server looks up building using identifier
-    const buildingId = await db.getBuildingForUser(userId);
+    const buildingId = await db.getBuildingForUser(userId); //SQL
     
     // Associate this connection with the building (useful for broadcasting later)
     socketToBuilding.set(ws, buildingId);
 
-    // B. Server updates that block in server-side grid
-    await db.updateGridBlock(buildingId, x, y, value);
+    // B. Server updates that block in server-side grid  // redis
+    const update = {x, y, color: value};
+    await updateRedis(buildingId, update);  
 
     // C. UPDATE Logic: Broadcast to all clients in the SAME building
     broadcastUpdate(buildingId, x, y, value);
