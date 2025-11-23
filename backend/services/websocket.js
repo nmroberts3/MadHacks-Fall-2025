@@ -1,5 +1,6 @@
 import WebSocket, { WebSocketServer } from "ws";
 import { removeConnection,  } from "";
+const { updateRedis } = require('./redisService.js')
 
 const wss = new WebSocketServer({ port: 8080 });
 

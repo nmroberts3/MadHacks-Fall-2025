@@ -56,4 +56,8 @@ async function loadRedis(buildingId, data) {
     }; 
 }; 
 
-exports.modules = {getRedis, updateRedis, loadRedis}; 
+module.exports = {
+    getRedis,
+    updateRedis,
+    loadRedis
+}; 

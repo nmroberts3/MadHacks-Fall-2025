@@ -1,14 +1,14 @@
-const { getRedis, loadRedis } = require( './redisService.js');
+const { getRedis, loadRedis } = require('./redisService.js');
+
 const { pool } = require("../db.js");
 
+// Load data from SQL into Redis
 const getState = () => {
     // Load all buildingIds from SQL
     const query = `
     SELECT 
-        b.name, 
-        ST_DumpValues(c.content_data, 1) as red_channel,
-        ST_DumpValues(c.content_data, 2) as green_channel,
-        ST_DumpValues(c.content_data, 3) as blue_channel
+        b.id, 
+        c.content_data
     FROM 
         buildings b
     JOIN 
@@ -17,35 +17,21 @@ const getState = () => {
 
     pool.query(query, (err, qres) => {
         if (err) {
-            res.status(500).json({
-                message: "Query failed"
-            });
+            console.log("Query error");
+            return;
         } else {
             const obj = qres.rows;
-            console.log(obj);
+
+            for (const {id, content_data} of obj) {
+                loadRedis(id, content_data);
+            }
         }
     });
 
     // for each buildingId, call loadRedis
-
-    for (let { id, red, green, blue }  in query) {
-        const state = new Array(100);
-
-        for (let i = 0; i < 100; i++) {
-            state[i] = new Array(100);
-        }
-
-        for (let i = 0; i < 100; i++) {
-            for (let j = 0; j < 100; j++) {
-                state[i][j] = [red[i][j], green[i][j], blue[i][j]];
-            }
-        }
-
-        loadRedis(id, state);
-    }
 }; 
 
-
+// Load data from Redis into SQL
 const loadState = async () => {
     let query = `SELECT id from buildings`;
     
@@ -62,16 +48,14 @@ const loadState = async () => {
 
         query = `
             UPDATE public.building_content
-            SET content_id = $1
+            SET content_data = $1
             WHERE rid = $2
             `;
         
-        for (let id of building_ids) {
-            pool.query(query, [getRedis(buildingId), id], (err, qres) => {
+        for (let { id } of building_ids) {
+            pool.query(query, [getRedis(id), id], (err, qres) => {
                 if (err) {
-                    res.status(500).json({
-                        message: "Query failed"
-                    });
+                    console.log("Query failed");
                 }
             });
         }
