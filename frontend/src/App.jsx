@@ -27,6 +27,7 @@ function App() {
       }}>
 
       <TransformWrapper
+        doubleClick={{ step: 0 }}
         initialScale={1}
         centerOnInit
         minScale={0.3}
