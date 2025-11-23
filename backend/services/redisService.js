@@ -1,4 +1,7 @@
-import { createClient } from 'redis';
+const { createClient } = require('redis');
+require('dotenv').config();
+
+console.log(process.env.REDIS_HOST, process.env.REDIS_PORT, process.env.REDIS_PASSWORD);
 
 const client = createClient({
     username: 'default',
@@ -11,7 +14,10 @@ const client = createClient({
 
 client.on('error', err => console.log('Redis Client Error', err));
 
-await client.connect();
+(async () => {
+    await client.connect();    
+})();
+
 
 
 // get data from redis 
@@ -46,4 +52,4 @@ async function loadRedis(buildingId, data) {
     }; 
 }; 
 
-export {getRedis, updateRedis, loadRedis}; 
+exports.modules = {getRedis, updateRedis, loadRedis}; 

@@ -1,4 +1,4 @@
-import { getRedis, loadRedis } from './redisService.js';
+const { getRedis, loadRedis } = require( './redisService.js');
 const { pool } = require("../db.js");
 
 const getState = () => {
@@ -29,4 +29,4 @@ const loadState = async (buidlingId) => {
     return /* some sql */;
 }
 
-export { getState , loadState };
+module.exports = { getState , loadState };
