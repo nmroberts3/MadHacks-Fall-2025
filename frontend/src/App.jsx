@@ -1,14 +1,14 @@
-import { useState } from 'react'
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
-import { Button } from 'react-bootstrap'
-import { useWebSocket } from './hooks/webHooks'
-import { authenticate } from './services/restService'
-import './App.css'
-import Screen from './components/Screen'
-import ColorSelector from './components/ColorSelector'
-import LandingPage from './components/LandingPage'
-import BuildingForm from './components/BuildingForm'
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch"
+import { useState } from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
+import { useWebSocket } from './hooks/webHooks';
+import { authenticate } from './services/restService';
+import './App.css';
+import Screen from './components/Screen';
+import ColorSelector from './components/ColorSelector';
+import LandingPage from './components/LandingPage';
+import BuildingForm from './components/BuildingForm';
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 import bg from './img/new_bg.png'
 

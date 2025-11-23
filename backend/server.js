@@ -112,7 +112,7 @@ app.get('/', (req, res) => {
     status: 'ok', 
     message: 'BadgerBoard API Server' 
   })
-})
+});
 
 
-module.exports = app
+module.exports = app;

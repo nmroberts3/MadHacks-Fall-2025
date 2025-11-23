@@ -65,6 +65,8 @@ authRoutes.post("/", (req, res) => {
 
         const id = crypto.randomUUID();
 
+        console.log(query_res.content_data);
+
         usersForBuilding[query_res.id] = id;
 
         res.send({

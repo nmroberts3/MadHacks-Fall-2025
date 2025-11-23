@@ -59,15 +59,38 @@ function Screen({ selectedColor }) {
     // Send auth request to backend server, store userId
 
     const callApi = async () => {
+      console.log('api called');
       let res;
+      let data;
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          data = [position.longitude, position.latitude];
+        }, (error) => {
+          alert("Error getting coords");
+        });
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
 
       try {
-        res = {userId:0 , initState: Array(10000).fill('rgb(255, 255, 255)')}; // Dummy data, we will have an awaited API call
+        res = fetch(
+          import.meta.env.VITE_tokenEndpoint,
+          {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json' // Tell the server we are sending JSON
+            },
+            body: JSON.stringify(data)
+          }
+        );
       } catch(e) {
         console.log(e);
       }
 
       const {userId, initState} = res;
+
+      console.log(initState);
 
       const temp = [];
 
@@ -76,6 +99,8 @@ function Screen({ selectedColor }) {
           temp.append(initState[i][j]);
         }
       }
+
+      console.log('temp');
 
       setPixels(temp);
       setUserId(userId);
